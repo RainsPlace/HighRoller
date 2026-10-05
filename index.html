@@ -510,21 +510,20 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
 var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbycKljGWNjye9ZXalWw5zAjFMKSrf32h5vymhAC46cOk5SzY6tcs9hSFxXbaifh6kTudw/exec';
 
 if (typeof google === 'undefined' || !google.script) {
-  window.google = { script: { run: new Proxy({}, { get: function(_, fn) {
-    return function() {
-      var handlers = { withSuccessHandler:null, withFailureHandler:null };
-      var proxy = {
-        withSuccessHandler: function(cb){ handlers.withSuccessHandler=cb; return proxy; },
-        withFailureHandler: function(cb){ handlers.withFailureHandler=cb; return proxy; }
+  function _gasRun_(h) {
+    var endpointMap = { hrGetPrimary:'data', hrGetChampions:'champions', hrGetFinishPos:'finishpos', hrBust:'bust' };
+    return new Proxy({}, { get: function(_, fn) {
+      if (fn === 'withSuccessHandler') return function(cb){ return _gasRun_(Object.assign({},h,{s:cb})); };
+      if (fn === 'withFailureHandler') return function(cb){ return _gasRun_(Object.assign({},h,{f:cb})); };
+      return function(){
+        fetch(WEBAPP_URL + '?get=' + (endpointMap[fn] || fn))
+          .then(function(r){ return r.json(); })
+          .then(function(d){ if(h.s) h.s(d); })
+          .catch(function(e){ if(h.f) h.f(e); });
       };
-      var endpointMap = { hrGetPrimary:'data', hrGetChampions:'champions', hrGetFinishPos:'finishpos', hrBust:'bust' };
-      fetch(WEBAPP_URL + '?get=' + (endpointMap[fn] || fn))
-        .then(function(r){ return r.json(); })
-        .then(function(d){ if(handlers.withSuccessHandler) handlers.withSuccessHandler(d); })
-        .catch(function(e){ if(handlers.withFailureHandler) handlers.withFailureHandler(e); });
-      return proxy;
-    };
-  }}) } };
+    }});
+  }
+  window.google = { script: { run: _gasRun_({}) } };
 }
 
 var primaryData = null, championsData = null, finishposData = null, currentTab = 'results';
