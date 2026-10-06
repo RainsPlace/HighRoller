@@ -526,34 +526,74 @@ if (typeof google === 'undefined' || !google.script) {
   window.google = { script: { run: _gasRun_({}) } };
 }
 
+// localStorage keys — bump version suffix if payload structure changes
+var LS_PRIMARY = 'hr_data_v1';
+var LS_CHAMPS  = 'hr_champs_v1';
+var LS_FINPOS  = 'hr_finpos_v1';
+
 var primaryData = null, championsData = null, finishposData = null, currentTab = 'results';
 var loadTimer = null, finishposLoading = false;
 
 document.addEventListener('DOMContentLoaded', function(){ initBackground(); loadData(); });
 
 function loadData() {
-  setLoadingMsg('Loading leaderboard data…');
-  // 45-second timeout so the spinner never hangs forever
-  if (loadTimer) clearTimeout(loadTimer);
-  loadTimer = setTimeout(function(){
-    showError('Data took too long to load. The server may be rebuilding the cache. Try refreshing in a moment.');
-  }, 45000);
-  google.script.run
-    .withSuccessHandler(function(d){
-      primaryData = d;
-      setLoadingMsg('Loading champions…');
-      google.script.run
-        .withSuccessHandler(function(c){ championsData = c; onDataReady(); })
-        .withFailureHandler(function(e){ championsData = {quarterChampions:[],playerChampionships:[],quarters:[]}; onDataReady(); })
-        .hrGetChampions();
-    })
-    .withFailureHandler(function(e){ clearTimeout(loadTimer); showError('Could not load data: ' + (e && e.message ? e.message : String(e))); })
-    .hrGetPrimary();
+  // Cache-first: show stored data instantly, then refresh in background
+  try {
+    var p = localStorage.getItem(LS_PRIMARY);
+    var c = localStorage.getItem(LS_CHAMPS);
+    if (p && c) {
+      primaryData   = JSON.parse(p);
+      championsData = JSON.parse(c);
+      onDataReady(false);   // render + hide loading screen right away
+      fetchFresh(true);     // silently update in background
+      return;
+    }
+  } catch(e) {}
+  // No cache yet — wait for server
+  fetchFresh(false);
 }
 
-function onDataReady() {
-  clearTimeout(loadTimer);
-  if (!primaryData || !primaryData.quarters) { showError('No data returned from server. Check that the GameResults sheet exists and has data.'); return; }
+function fetchFresh(isBackground) {
+  if (!isBackground) {
+    setLoadingMsg('Loading leaderboard data…');
+    if (loadTimer) clearTimeout(loadTimer);
+    loadTimer = setTimeout(function(){
+      showError('Data took too long to load. The server may be rebuilding the cache. Try refreshing in a moment.');
+    }, 45000);
+  }
+  // Fire primary and champions in parallel — both must arrive before rendering
+  var done = 0, fresh = {};
+  function maybeFinish() {
+    if (++done < 2) return;
+    if (fresh.primary) {
+      primaryData   = fresh.primary;
+      championsData = fresh.champs || {quarterChampions:[],playerChampionships:[],quarters:[]};
+      try {
+        localStorage.setItem(LS_PRIMARY, JSON.stringify(primaryData));
+        localStorage.setItem(LS_CHAMPS,  JSON.stringify(championsData));
+      } catch(e) {}
+      onDataReady(isBackground);
+    } else if (!isBackground) {
+      clearTimeout(loadTimer);
+      showError('Could not load data from server.');
+    }
+  }
+  google.script.run
+    .withSuccessHandler(function(d){ fresh.primary = d; maybeFinish(); })
+    .withFailureHandler(function(e){ if(!isBackground){ clearTimeout(loadTimer); showError('Could not load data: '+(e&&e.message?e.message:String(e))); } else { done++; } })
+    .hrGetPrimary();
+  google.script.run
+    .withSuccessHandler(function(c){ fresh.champs = c; maybeFinish(); })
+    .withFailureHandler(function(){ fresh.champs = {quarterChampions:[],playerChampionships:[],quarters:[]}; maybeFinish(); })
+    .hrGetChampions();
+}
+
+function onDataReady(isBackground) {
+  if (!isBackground) clearTimeout(loadTimer);
+  if (!primaryData || !primaryData.quarters) {
+    if (!isBackground) showError('No data returned from server. Check that the GameResults sheet exists and has data.');
+    return;
+  }
   try {
     populateQuarterDropdowns();
     renderLeaderboard();
@@ -563,10 +603,12 @@ function onDataReady() {
     renderChampions();
     var upd = primaryData.updated ? new Date(primaryData.updated).toLocaleString() : '';
     if (upd) document.getElementById('updatedTime').textContent = 'Last updated: ' + upd;
-    document.getElementById('loadingScreen').classList.add('hidden');
-    document.getElementById('app').style.display = '';
+    if (!isBackground) {
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('app').style.display = '';
+    }
   } catch(err) {
-    showError('Render error: ' + err.message);
+    if (!isBackground) showError('Render error: ' + err.message);
   }
 }
 
@@ -919,12 +961,33 @@ function renderChampions() {
 function loadAndRenderFinishPos() {
   if (finishposData) { renderFinishPos(); return; }
   if (finishposLoading) return;
+  // Cache-first: show immediately, refresh in background
+  try {
+    var fp = localStorage.getItem(LS_FINPOS);
+    if (fp) {
+      finishposData = JSON.parse(fp);
+      populateFinishPosDropdown();
+      renderFinishPos();
+      // Background refresh
+      google.script.run
+        .withSuccessHandler(function(d) {
+          finishposData = d;
+          try { localStorage.setItem(LS_FINPOS, JSON.stringify(d)); } catch(e) {}
+          populateFinishPosDropdown();
+          renderFinishPos();
+        })
+        .withFailureHandler(function(){})
+        .hrGetFinishPos();
+      return;
+    }
+  } catch(e) {}
   finishposLoading = true;
   document.getElementById('fpBody').innerHTML = '<div class="empty-msg" style="padding:24px">Loading finish position data…</div>';
   google.script.run
     .withSuccessHandler(function(d) {
       finishposData = d;
       finishposLoading = false;
+      try { localStorage.setItem(LS_FINPOS, JSON.stringify(d)); } catch(e) {}
       populateFinishPosDropdown();
       renderFinishPos();
     })
@@ -1053,9 +1116,10 @@ function forceRefresh() {
   document.getElementById('app').style.display = 'none';
   setLoadingMsg('Clearing cache…');
   primaryData = null; championsData = null; finishposData = null; finishposLoading = false;
+  try { localStorage.removeItem(LS_PRIMARY); localStorage.removeItem(LS_CHAMPS); localStorage.removeItem(LS_FINPOS); } catch(e) {}
   google.script.run
-    .withSuccessHandler(function(){ setLoadingMsg('Loading leaderboard data…'); loadData(); })
-    .withFailureHandler(function(){ setLoadingMsg('Loading leaderboard data…'); loadData(); })
+    .withSuccessHandler(function(){ setLoadingMsg('Loading leaderboard data…'); fetchFresh(false); })
+    .withFailureHandler(function(){ setLoadingMsg('Loading leaderboard data…'); fetchFresh(false); })
     .hrBust();
 }
 
