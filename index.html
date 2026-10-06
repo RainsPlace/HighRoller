@@ -40,6 +40,10 @@ body{background:transparent;color:var(--text-main);font-family:'Crimson Pro',Geo
 .loading-msg{font-size:.85rem;color:var(--text-dim);font-style:italic;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
+/* PAGE VIEW COUNTER */
+#page-footer{text-align:center;padding:14px 16px 18px;font-size:.75rem;color:var(--text-muted);border-top:1px solid var(--border);font-family:'Cinzel',serif;letter-spacing:.12em;position:relative;z-index:1;}
+#pvCount{color:var(--gold-dim);font-weight:600;}
+
 /* ERROR */
 #errorScreen{display:none;position:fixed;inset:0;background:rgba(3,6,4,.92);align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:998;padding:24px;text-align:center;}
 #errorScreen.visible{display:flex;}
@@ -505,6 +509,8 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
     </main>
   </div><!-- /.app-body -->
 </div><!-- /#app -->
+
+<div id="page-footer">👁 PAGE VIEWS: <span id="pvCount">—</span></div>
 
 <script>
 var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbycKljGWNjye9ZXalWw5zAjFMKSrf32h5vymhAC46cOk5SzY6tcs9hSFxXbaifh6kTudw/exec';
@@ -1155,6 +1161,17 @@ function showError(msg){
   document.getElementById('errorMsg').textContent = msg;
   document.getElementById('errorScreen').classList.add('visible');
 }
+
+// ── PAGE VIEW COUNTER ─────────────────────────────────────────
+(function(){
+  fetch(WEBAPP_URL + '?get=pageview')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var el = document.getElementById('pvCount');
+      if (el && d && d.count) el.textContent = Number(d.count).toLocaleString();
+    })
+    .catch(function(){});
+})();
 </script>
 </body>
 </html>
