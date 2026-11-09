@@ -14,7 +14,7 @@
   --bg-row:#112615; --bg-row-alt:#0c1d10;
   --text-main:#e8eed0; --text-dim:#7a9880; --text-muted:#3a5040;
   --border:#1a3520; --border-gold:#3a2e10;
-  --accent-hro:#2d8a4e; --accent-bbz:#7a5cb8; --accent-me:#c47a45;
+  --accent-hro:#2d8a4e; --accent-bbz:#7a5cb8; --accent-dsnl:#2a9f8f; --accent-dsol:#c47a45;
   --red:#c44a4a;
   --nw:#2ecfff; --ob:#b07eef; --wh:#e8b84b; --eb:#e85050; --mg:#a0b8d0; --hr:#60c080;
   --sb-w:210px;
@@ -128,9 +128,11 @@ select:focus{border-color:var(--gold);}
 .panel-header{display:flex;align-items:center;justify-content:center;position:relative;padding:16px 14px 12px;background:var(--bg-dark);border-bottom:2px solid var(--border-gold);flex-shrink:0;}
 .panel-title{font-family:'Cinzel',serif;font-size:1.15rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-align:center;}
 .panel-dot{width:7px;height:7px;border-radius:50%;position:absolute;right:14px;top:50%;transform:translateY(-50%);}
-.panel-hro .panel-title{color:var(--accent-hro);} .panel-bbz .panel-title{color:var(--accent-bbz);} .panel-combined .panel-title{color:var(--gold);}
+.panel-hro .panel-title{color:var(--accent-hro);} .panel-bbz .panel-title{color:var(--accent-bbz);} .panel-dsnl .panel-title{color:var(--accent-dsnl);} .panel-dsol .panel-title{color:var(--accent-dsol);} .panel-combined .panel-title{color:var(--gold);}
 .panel-hro .panel-dot{background:var(--accent-hro);box-shadow:0 0 6px var(--accent-hro);}
 .panel-bbz .panel-dot{background:var(--accent-bbz);box-shadow:0 0 6px var(--accent-bbz);}
+.panel-dsnl .panel-dot{background:var(--accent-dsnl);box-shadow:0 0 6px var(--accent-dsnl);}
+.panel-dsol .panel-dot{background:var(--accent-dsol);box-shadow:0 0 6px var(--accent-dsol);}
 .panel-combined .panel-dot{background:var(--gold);box-shadow:0 0 6px var(--gold);}
 .panel-podium{display:flex;align-items:flex-end;justify-content:center;gap:6px;padding:18px 10px 14px;background:linear-gradient(180deg,#030b05 0%,var(--bg-panel) 100%);border-bottom:1px solid var(--border);flex-shrink:0;}
 .pp{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0;}
@@ -412,7 +414,8 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
         <button class="sb-btn" onclick="switchTab('leaderboard')">🏆 Leaderboard</button>
         <button class="sb-btn" onclick="switchTab('hro')">🃏 High Roller Open</button>
         <button class="sb-btn" onclick="switchTab('bbz')">♣ Big Ballerz</button>
-        <button class="sb-btn" onclick="switchTab('me')">🎲 Main Event</button>
+        <button class="sb-btn" onclick="switchTab('dsnl')">🎯 Deep Stack NLHE</button>
+        <button class="sb-btn" onclick="switchTab('dsol')">♠ Deep Stack NLOL</button>
         <button class="sb-btn" onclick="switchTab('champions')">👑 Champions</button>
         <button class="sb-btn" onclick="switchTab('finishpos')">🎯 Finish Position</button>
         <button class="sb-btn" onclick="switchTab('calendar')">📅 Calendar</button>
@@ -512,21 +515,39 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
         </div>
       </div>
 
-      <!-- MAIN EVENT TAB -->
-      <div id="tab-me" style="display:none">
+      <!-- DEEP STACK NLHE TAB -->
+      <div id="tab-dsnl" style="display:none">
         <div class="controls">
           <span class="control-label">Quarter</span>
-          <select id="meQuarterSel" onchange="renderMainEvent()"></select>
+          <select id="dsnlQuarterSel" onchange="renderSingleGame('dsnl')"></select>
+          <span class="best-n-badge">BEST 9 SCORES</span>
         </div>
-        <div id="latestMEWrap"></div>
-        <div class="single-panel" id="mePanel" style="margin-top:16px">
+        <div class="single-panel" id="dsnlPanel">
           <div class="sp-header">
-            <div class="sp-title" style="color:var(--accent-me)">Main Event</div>
-            <div class="sp-sub">Monthly feature · Points tracked separately — not combined with season leaderboard</div>
-            <div class="sp-qlabel" id="meQLabel"></div>
+            <div class="sp-title" style="color:var(--accent-dsnl)">Deep Stack NLHE</div>
+            <div class="sp-sub">No-Limit Texas Hold'em · Best 9 of season scores count</div>
+            <div class="sp-qlabel" id="dsnlQLabel"></div>
           </div>
-          <div id="mePodium" class="sp-podium"></div>
-          <table class="sp-table"><thead><tr><th>#</th><th>Player</th><th>Games</th><th>Points</th></tr></thead><tbody id="meTable"></tbody></table>
+          <div id="dsnlPodium" class="sp-podium"></div>
+          <table class="sp-table"><thead><tr><th>#</th><th>Player</th><th>Games</th><th>Points</th></tr></thead><tbody id="dsnlTable"></tbody></table>
+        </div>
+      </div>
+
+      <!-- DEEP STACK NLOL TAB -->
+      <div id="tab-dsol" style="display:none">
+        <div class="controls">
+          <span class="control-label">Quarter</span>
+          <select id="dsolQuarterSel" onchange="renderSingleGame('dsol')"></select>
+          <span class="best-n-badge">BEST 9 SCORES</span>
+        </div>
+        <div class="single-panel" id="dsolPanel">
+          <div class="sp-header">
+            <div class="sp-title" style="color:var(--accent-dsol)">Deep Stack NLOL</div>
+            <div class="sp-sub">Omaha Hi/Lo · Best 9 of season scores count</div>
+            <div class="sp-qlabel" id="dsolQLabel"></div>
+          </div>
+          <div id="dsolPodium" class="sp-podium"></div>
+          <table class="sp-table"><thead><tr><th>#</th><th>Player</th><th>Games</th><th>Points</th></tr></thead><tbody id="dsolTable"></tbody></table>
         </div>
       </div>
 
@@ -536,7 +557,7 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
           <div class="champ-title">🏆 Quarter Champions</div>
           <div class="champ-grid" id="champGrid"></div>
           <div class="champ-title">🎖 Championship Counts</div>
-          <table class="champ-count-table"><thead><tr><th>Player</th><th>Combined</th><th>HR Open</th><th>Big Ballerz</th><th>Main Event</th><th>Total</th></tr></thead><tbody id="champCountTable"></tbody></table>
+          <table class="champ-count-table"><thead><tr><th>Player</th><th>Combined</th><th>HR Open</th><th>Big Ballerz</th><th>Deep Stack NL</th><th>Deep Stack OL</th><th>Total</th></tr></thead><tbody id="champCountTable"></tbody></table>
         </div>
       </div>
 
@@ -689,19 +710,17 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
               <span class="li-card-icon">🎰</span>
               <div class="li-card-titles">
                 <span class="li-card-name">High Roller Series</span>
-                <span class="li-card-tag">High Stakes · Weekly Events · Monthly Main Event · 250,000+ Chip Entry</span>
+                <span class="li-card-tag">High Stakes · Weekly Events · 250,000+ Chip Entry</span>
               </div>
             </div>
             <div class="li-card-body">
-              <p class="li-desc">The High Roller Series runs inside the Leagues Invitational lobby and features the highest-stakes games in the private league community. Weekly sessions plus a massive monthly Main Event draw the best players from across all leagues.</p>
+              <p class="li-desc">The High Roller Series runs inside the Leagues Invitational lobby and features the highest-stakes games in the private league community. Four weekly games alternate throughout the season, drawing the best players from across all leagues.</p>
               <div class="li-section-title">Weekly Schedule (EST)</div>
               <div class="li-schedule">
                 <div class="li-sched-row"><span class="li-sched-day">Sunday</span><span class="li-sched-time">6:30 PM</span><span class="li-sched-game">High Roller Open <span class="li-sched-note">NL Hold'em · 250k entry</span></span></div>
                 <div class="li-sched-row"><span class="li-sched-day">Wednesday</span><span class="li-sched-time">7:00 PM</span><span class="li-sched-game">Big Ballerz <span class="li-sched-note">Omaha Hi/Lo · 250k entry</span></span></div>
-              </div>
-              <div class="li-section-title">Monthly Event</div>
-              <div class="li-schedule">
-                <div class="li-sched-row"><span class="li-sched-day">3rd Sunday</span><span class="li-sched-time">7:30 PM</span><span class="li-sched-game">Main Event <span class="li-sched-note">NL Hold'em · 1M entry · monthly</span></span></div>
+                <div class="li-sched-row"><span class="li-sched-day">Alternating Mondays</span><span class="li-sched-time">6:30 PM</span><span class="li-sched-game">Deep Stack NLHE <span class="li-sched-note">NL Hold'em · 250k entry</span></span></div>
+                <div class="li-sched-row"><span class="li-sched-day">Alternating Mondays</span><span class="li-sched-time">6:30 PM</span><span class="li-sched-game">Deep Stack NLOL <span class="li-sched-note">Omaha Hi/Lo · 250k entry</span></span></div>
               </div>
               <div class="li-section-title">Links</div>
               <div class="li-links">
@@ -1001,7 +1020,7 @@ function onDataReady(isBackground) {
 }
 
 // ── TAB SWITCHING ─────────────────────────────────────────────
-var TABS = ['results','leaderboard','hro','bbz','me','champions','finishpos','calendar','leagueinfo'];
+var TABS = ['results','leaderboard','hro','bbz','dsnl','dsol','champions','finishpos','calendar','leagueinfo'];
 
 function switchTab(name) {
   currentTab = name;
@@ -1014,20 +1033,21 @@ function switchTab(name) {
   });
   if (name === 'hro')       renderSingleGame('hro');
   if (name === 'bbz')       renderSingleGame('bbz');
-  if (name === 'me')        renderMainEvent();
+  if (name === 'dsnl')      renderSingleGame('dsnl');
+  if (name === 'dsol')      renderSingleGame('dsol');
   if (name === 'champions') renderChampions();
   if (name === 'finishpos') loadAndRenderFinishPos();
 }
 
 function tabLabel(name) {
-  var m = {results:'latest',leaderboard:'leaderboard',hro:'high roller',bbz:'big ballerz',me:'main event',champions:'champions',finishpos:'finish',calendar:'calendar',leagueinfo:'leagues'};
+  var m = {results:'latest',leaderboard:'leaderboard',hro:'high roller',bbz:'big ballerz',dsnl:'deep stack nlhe',dsol:'deep stack nlol',champions:'champions',finishpos:'finish',calendar:'calendar',leagueinfo:'leagues'};
   return m[name] || name;
 }
 
 // ── QUARTER DROPDOWNS ─────────────────────────────────────────
 function populateQuarterDropdowns() {
   var quarters = primaryData.quarters || [];
-  ['lbQuarterSel','hroQuarterSel','bbzQuarterSel'].forEach(function(id){
+  ['lbQuarterSel','hroQuarterSel','bbzQuarterSel','dsnlQuarterSel','dsolQuarterSel'].forEach(function(id){
     var sel = document.getElementById(id);
     sel.innerHTML = '';
     quarters.forEach(function(q, i){
@@ -1036,15 +1056,6 @@ function populateQuarterDropdowns() {
       if (i === 0) opt.selected = true;
       sel.appendChild(opt);
     });
-  });
-  var meQ = (primaryData.mainEvent || {}).quarters || [];
-  var ms = document.getElementById('meQuarterSel');
-  ms.innerHTML = '';
-  meQ.forEach(function(q, i){
-    var opt = document.createElement('option');
-    opt.value = q; opt.textContent = q;
-    if (i === 0) opt.selected = true;
-    ms.appendChild(opt);
   });
 }
 
@@ -1086,7 +1097,8 @@ function setStatCards(lg) {
   document.getElementById('lgDateSub').textContent = dt.getFullYear();
   var gameLabel = lg.gameName === 'High Roller Open' ? 'NL Hold\'em' :
                   lg.gameName === 'Big Ballerz'      ? 'Omaha Hi/Lo' :
-                  lg.gameName === 'Main Event'        ? 'Main Event'  : (lg.gameName || '—');
+                  lg.gameName === 'Deep Stack NLHE'  ? 'NL Hold\'em' :
+                  lg.gameName === 'Deep Stack NLOL'  ? 'Omaha Hi/Lo' : (lg.gameName || '—');
   document.getElementById('lgGame').textContent     = gameLabel;
   document.getElementById('lgEntrants').textContent = lg.numPlayers || '—';
   var qParts = String(lg.quarter || '—').split(' ');
@@ -1101,7 +1113,8 @@ function copyResultsToClipboard() {
 
   var gameLabel = lg.gameName === 'High Roller Open' ? 'High Roller Open (Hold\'em)' :
                   lg.gameName === 'Big Ballerz'      ? 'Big Ballerz (Omaha Hi/Lo)' :
-                  lg.gameName === 'Main Event'        ? 'Main Event' : (lg.gameName || '');
+                  lg.gameName === 'Deep Stack NLHE'  ? 'Deep Stack NLHE (Hold\'em)' :
+                  lg.gameName === 'Deep Stack NLOL'  ? 'Deep Stack NLOL (Omaha Hi/Lo)' : (lg.gameName || '');
 
   var dateOnly = String(lg.date || '').substring(0, 10);
   var dt = new Date(dateOnly + 'T12:00:00');
@@ -1166,7 +1179,7 @@ function flashCopyBtn() {
 }
 
 function captureTabImage() {
-  var captureTargets = { results: 'resultsCard', hro: 'hroPanel', bbz: 'bbzPanel', me: 'mePanel' };
+  var captureTargets = { results: 'resultsCard', hro: 'hroPanel', bbz: 'bbzPanel', dsnl: 'dsnlPanel', dsol: 'dsolPanel' };
   var targetId = captureTargets[currentTab] || ('tab-' + currentTab);
   var el  = document.getElementById(targetId);
   var btn = document.getElementById('copyImgBtn');
@@ -1209,6 +1222,8 @@ function renderLeaderboard() {
   document.getElementById('lbPanels').innerHTML =
     buildPanel('hro', 'HR Open', qd.hro || []) +
     buildPanel('bbz', 'Big Ballerz', qd.bbz || []) +
+    buildPanel('dsnl', 'Deep Stack NL', qd.dsnl || []) +
+    buildPanel('dsol', 'Deep Stack OL', qd.dsol || []) +
     buildPanelCombined('Combined', qd.combined || []);
 }
 
@@ -1232,7 +1247,7 @@ function buildPanelCombined(title, rows) {
     '<div class="panel-list">' + rest.map(function(r){
       return '<div class="panel-row"><span class="pr-rank">' + r.rank + '</span>' +
         '<span class="pr-name">' + esc(r.player) + '<br><span class="pr-sub">' +
-        fmt(r.hro_pts) + ' + ' + fmt(r.bbz_pts) + '</span></span>' +
+        fmt(r.hro_pts) + '+' + fmt(r.bbz_pts) + '+' + fmt(r.dsnl_pts) + '+' + fmt(r.dsol_pts) + '</span></span>' +
         '<span class="pr-pts">' + fmt(r.total_pts) + '</span></div>';
     }).join('') + '</div></div>';
 }
@@ -1253,7 +1268,7 @@ function buildMiniPodium(top3) {
 
 // ── HR OPEN / BIG BALLERZ ─────────────────────────────────────
 function renderSingleGame(key) {
-  var q    = document.getElementById(key === 'hro' ? 'hroQuarterSel' : 'bbzQuarterSel').value;
+  var q    = document.getElementById(key + 'QuarterSel').value;
   var ql   = document.getElementById(key + 'QLabel');
   if (ql) ql.textContent = q || '';
   var rows = ((primaryData.data || {})[q] || {})[key] || [];
@@ -1265,38 +1280,6 @@ function renderSingleGame(key) {
   }).join('') || '<tr><td colspan="4" class="empty-msg">No data for this quarter.</td></tr>';
 }
 
-// ── MAIN EVENT ────────────────────────────────────────────────
-function renderMainEvent() {
-  var q    = document.getElementById('meQuarterSel').value;
-  var ql   = document.getElementById('meQLabel');
-  if (ql) ql.textContent = q || '';
-  var rows = ((primaryData.mainEvent || {}).data || {})[q] || [];
-  renderSinglePodium('mePodium', rows.slice(0,3));
-  document.getElementById('meTable').innerHTML = rows.map(function(r){
-    var rc = r.rank <= 3 ? ' rank-' + r.rank : '';
-    return '<tr><td class="' + rc + '">' + r.rank + '</td><td>' + esc(r.player) + '</td>' +
-      '<td style="text-align:center">' + r.games + '</td><td>' + fmt(r.points) + '</td></tr>';
-  }).join('') || '<tr><td colspan="4" class="empty-msg">No Main Event data for this quarter.</td></tr>';
-
-  var lm = primaryData.latestME;
-  var wrap = document.getElementById('latestMEWrap');
-  if (!lm || !lm.players || !lm.players.length) { wrap.innerHTML = ''; return; }
-  var rankEmoji = ['','🥇','🥈','🥉'];
-  var html = '<div style="margin:16px 14px 0;background:var(--bg-card);border:1px solid var(--border-gold);border-radius:8px;overflow:hidden">' +
-    '<div style="padding:10px 16px;background:var(--bg-dark);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">' +
-    '<span style="font-family:Cinzel,serif;font-size:.68rem;letter-spacing:.2em;color:var(--text-dim)">LATEST MAIN EVENT</span>' +
-    '<span style="font-family:Cinzel,serif;font-size:.82rem;color:var(--gold)">Main Event</span>' +
-    '<span style="font-size:.76rem;color:var(--text-dim);margin-left:auto">' + lm.date + ' · ' + lm.numPlayers + ' players · ' + lm.quarter + '</span>' +
-    '</div><table class="rt-table"><thead><tr><th>#</th><th>Player</th><th style="text-align:right">Points</th><th style="text-align:right">Chips Won</th></tr></thead><tbody>';
-  lm.players.forEach(function(p){
-    var medal = rankEmoji[p.rank] || ('#' + p.rank);
-    html += '<tr><td class="rt-rank">' + medal + '</td><td class="rt-name">' + esc(p.player) + '</td>' +
-      '<td class="rt-pts">' + fmt(p.points) + '</td>' +
-      '<td class="rt-chips">' + (p.chips > 0 ? p.chips.toLocaleString() + ' chips' : '—') + '</td></tr>';
-  });
-  html += '</tbody></table></div>';
-  wrap.innerHTML = html;
-}
 
 function renderSinglePodium(id, top3) {
   var el = document.getElementById(id);
@@ -1325,7 +1308,7 @@ function renderChampions() {
     var ya=parseInt(a.slice(3)),qa=parseInt(a[1]),yb=parseInt(b.slice(3)),qb=parseInt(b[1]);
     return yb!==ya ? yb-ya : qb-qa;
   });
-  var catColor = {'Combined':'var(--gold)','HR Open':'var(--accent-hro)','Big Ballerz':'var(--accent-bbz)','Main Event':'var(--accent-me)'};
+  var catColor = {'Combined':'var(--gold)','HR Open':'var(--accent-hro)','Big Ballerz':'var(--accent-bbz)','Deep Stack NL':'var(--accent-dsnl)','Deep Stack OL':'var(--accent-dsol)'};
   var html = qOrder.map(function(q){
     return byQ[q].map(function(c){
       var col = catColor[c.category] || 'var(--gold)';
@@ -1341,8 +1324,9 @@ function renderChampions() {
   document.getElementById('champCountTable').innerHTML = pc.map(function(p){
     return '<tr><td>' + esc(p.player) + '</td><td>' + (p.combined||'–') + '</td>' +
       '<td>' + (p.hro||'–') + '</td><td>' + (p.bbz||'–') + '</td>' +
-      '<td>' + (p.me||'–') + '</td><td><strong>' + p.total + '</strong></td></tr>';
-  }).join('') || '<tr><td colspan="6" class="empty-msg">No champions yet.</td></tr>';
+      '<td>' + (p.dsnl||'–') + '</td><td>' + (p.dsol||'–') + '</td>' +
+      '<td><strong>' + p.total + '</strong></td></tr>';
+  }).join('') || '<tr><td colspan="7" class="empty-msg">No champions yet.</td></tr>';
 }
 
 // ── FINISH POSITION ───────────────────────────────────────────
@@ -1455,7 +1439,7 @@ function renderCalendar() {
 
 // ── LEAGUES INFO ──────────────────────────────────────────────
 var LEAGUES_INFO = [
-  {name:'♠ High Rollers — Leagues Invitational', desc:'Three-game monthly series: High Roller Open (NL Hold\'em), Big Ballerz (Omaha Hi/Lo), and Main Event. Best 9 scores per game count toward the quarterly combined leaderboard.', links:[
+  {name:'♠ High Rollers — Leagues Invitational', desc:'Four-game weekly series: High Roller Open (NL Hold\'em), Big Ballerz (Omaha Hi/Lo), Deep Stack NLHE, and Deep Stack NLOL. Best 9 scores per game count toward the quarterly combined leaderboard.', links:[
     {text:'Web App',url:WEBAPP_URL},
     {text:'Sheets Leaderboard',url:'https://docs.google.com/spreadsheets/d/1tR7bD0Kv7vuFX_FJVZF7RxsStf6OUI6Nr21LTp9Hp6s/edit?gid=34561392#gid=34561392'},
     {text:'League Lobby',url:'https://www.casino.org/replaypoker/leagues/77'}
