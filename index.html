@@ -1478,13 +1478,10 @@ function forceRefresh() {
   document.getElementById('loadingScreen').style.cssText = 'display:flex;opacity:1';
   document.getElementById('loadingScreen').classList.remove('hidden');
   document.getElementById('app').style.display = 'none';
-  setLoadingMsg('Clearing cache…');
   primaryData = null; championsData = null; finishposData = null; finishposLoading = false;
   try { localStorage.removeItem(LS_PRIMARY); localStorage.removeItem(LS_CHAMPS); localStorage.removeItem(LS_FINPOS); } catch(e) {}
-  google.script.run
-    .withSuccessHandler(function(){ setLoadingMsg('Loading leaderboard data…'); fetchFresh(false); })
-    .withFailureHandler(function(){ setLoadingMsg('Loading leaderboard data…'); fetchFresh(false); })
-    .hrBust();
+  setLoadingMsg('Loading leaderboard data…');
+  fetchFresh(false);
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
