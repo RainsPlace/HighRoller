@@ -415,7 +415,7 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
         <button class="sb-btn" onclick="switchTab('hro')">🃏 High Roller Open</button>
         <button class="sb-btn" onclick="switchTab('bbz')">♣ Big Ballerz</button>
         <button class="sb-btn" onclick="switchTab('dsnl')">🎯 Deep Stack NLHE</button>
-        <button class="sb-btn" onclick="switchTab('dsol')">♠ Deep Stack NLOL</button>
+        <button class="sb-btn" onclick="switchTab('dsol')">♠ Deep Stack NLOHL</button>
         <button class="sb-btn" onclick="switchTab('champions')">👑 Champions</button>
         <button class="sb-btn" onclick="switchTab('finishpos')">🎯 Finish Position</button>
         <button class="sb-btn" onclick="switchTab('calendar')">📅 Calendar</button>
@@ -533,7 +533,7 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
         </div>
       </div>
 
-      <!-- DEEP STACK NLOL TAB -->
+      <!-- DEEP STACK NLOHL TAB -->
       <div id="tab-dsol" style="display:none">
         <div class="controls">
           <span class="control-label">Quarter</span>
@@ -542,7 +542,7 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
         </div>
         <div class="single-panel" id="dsolPanel">
           <div class="sp-header">
-            <div class="sp-title" style="color:var(--accent-dsol)">Deep Stack NLOL</div>
+            <div class="sp-title" style="color:var(--accent-dsol)">Deep Stack NLOHL</div>
             <div class="sp-sub">Omaha Hi/Lo · Best 9 of season scores count</div>
             <div class="sp-qlabel" id="dsolQLabel"></div>
           </div>
@@ -720,7 +720,7 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
                 <div class="li-sched-row"><span class="li-sched-day">Sunday</span><span class="li-sched-time">6:30 PM</span><span class="li-sched-game">High Roller Open <span class="li-sched-note">NL Hold'em · 250k entry</span></span></div>
                 <div class="li-sched-row"><span class="li-sched-day">Wednesday</span><span class="li-sched-time">7:00 PM</span><span class="li-sched-game">Big Ballerz <span class="li-sched-note">Omaha Hi/Lo · 250k entry</span></span></div>
                 <div class="li-sched-row"><span class="li-sched-day">Alternating Mondays</span><span class="li-sched-time">6:30 PM</span><span class="li-sched-game">Deep Stack NLHE <span class="li-sched-note">NL Hold'em · 250k entry</span></span></div>
-                <div class="li-sched-row"><span class="li-sched-day">Alternating Mondays</span><span class="li-sched-time">6:30 PM</span><span class="li-sched-game">Deep Stack NLOL <span class="li-sched-note">Omaha Hi/Lo · 250k entry</span></span></div>
+                <div class="li-sched-row"><span class="li-sched-day">Alternating Mondays</span><span class="li-sched-time">6:30 PM</span><span class="li-sched-game">Deep Stack NLOHL <span class="li-sched-note">Omaha Hi/Lo · 250k entry</span></span></div>
               </div>
               <div class="li-section-title">Links</div>
               <div class="li-links">
@@ -1040,7 +1040,7 @@ function switchTab(name) {
 }
 
 function tabLabel(name) {
-  var m = {results:'latest',leaderboard:'leaderboard',hro:'high roller',bbz:'big ballerz',dsnl:'deep stack nlhe',dsol:'deep stack nlol',champions:'champions',finishpos:'finish',calendar:'calendar',leagueinfo:'leagues'};
+  var m = {results:'latest',leaderboard:'leaderboard',hro:'high roller',bbz:'big ballerz',dsnl:'deep stack nlhe',dsol:'deep stack nlohl',champions:'champions',finishpos:'finish',calendar:'calendar',leagueinfo:'leagues'};
   return m[name] || name;
 }
 
@@ -1098,7 +1098,7 @@ function setStatCards(lg) {
   var gameLabel = lg.gameName === 'High Roller Open' ? 'NL Hold\'em' :
                   lg.gameName === 'Big Ballerz'      ? 'Omaha Hi/Lo' :
                   lg.gameName === 'Deep Stack NLHE'  ? 'NL Hold\'em' :
-                  lg.gameName === 'Deep Stack NLOL'  ? 'Omaha Hi/Lo' : (lg.gameName || '—');
+                  lg.gameName === 'Deep Stack NLOHL'  ? 'Omaha Hi/Lo' : (lg.gameName || '—');
   document.getElementById('lgGame').textContent     = gameLabel;
   document.getElementById('lgEntrants').textContent = lg.numPlayers || '—';
   var qParts = String(lg.quarter || '—').split(' ');
@@ -1114,7 +1114,7 @@ function copyResultsToClipboard() {
   var gameLabel = lg.gameName === 'High Roller Open' ? 'High Roller Open (Hold\'em)' :
                   lg.gameName === 'Big Ballerz'      ? 'Big Ballerz (Omaha Hi/Lo)' :
                   lg.gameName === 'Deep Stack NLHE'  ? 'Deep Stack NLHE (Hold\'em)' :
-                  lg.gameName === 'Deep Stack NLOL'  ? 'Deep Stack NLOL (Omaha Hi/Lo)' : (lg.gameName || '');
+                  lg.gameName === 'Deep Stack NLOHL'  ? 'Deep Stack NLOHL (Omaha Hi/Lo)' : (lg.gameName || '');
 
   var dateOnly = String(lg.date || '').substring(0, 10);
   var dt = new Date(dateOnly + 'T12:00:00');
@@ -1439,7 +1439,7 @@ function renderCalendar() {
 
 // ── LEAGUES INFO ──────────────────────────────────────────────
 var LEAGUES_INFO = [
-  {name:'♠ High Rollers — Leagues Invitational', desc:'Four-game weekly series: High Roller Open (NL Hold\'em), Big Ballerz (Omaha Hi/Lo), Deep Stack NLHE, and Deep Stack NLOL. Best 9 scores per game count toward the quarterly combined leaderboard.', links:[
+  {name:'♠ High Rollers — Leagues Invitational', desc:'Four-game weekly series: High Roller Open (NL Hold\'em), Big Ballerz (Omaha Hi/Lo), Deep Stack NLHE, and Deep Stack NLOHL. Best 9 scores per game count toward the quarterly combined leaderboard.', links:[
     {text:'Web App',url:WEBAPP_URL},
     {text:'Sheets Leaderboard',url:'https://docs.google.com/spreadsheets/d/1tR7bD0Kv7vuFX_FJVZF7RxsStf6OUI6Nr21LTp9Hp6s/edit?gid=34561392#gid=34561392'},
     {text:'League Lobby',url:'https://www.casino.org/replaypoker/leagues/77'}
