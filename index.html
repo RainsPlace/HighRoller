@@ -1010,6 +1010,7 @@ function onDataReady(isBackground) {
     renderChampions();
     var upd = primaryData.updated ? new Date(primaryData.updated).toLocaleString() : '';
     if (upd) document.getElementById('updatedTime').textContent = 'Last updated: ' + upd;
+    document.getElementById('refreshBtn').classList.remove('spinning');
     if (!isBackground) {
       document.getElementById('loadingScreen').classList.add('hidden');
       document.getElementById('app').style.display = '';
