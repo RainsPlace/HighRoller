@@ -1221,11 +1221,11 @@ function renderLeaderboard() {
   var q   = document.getElementById('lbQuarterSel').value;
   var qd  = (primaryData.data || {})[q] || {};
   document.getElementById('lbPanels').innerHTML =
+    buildPanelCombined('Combined', qd.combined || []) +
     buildPanel('hro', 'HR Open', qd.hro || []) +
     buildPanel('bbz', 'Big Ballerz', qd.bbz || []) +
     buildPanel('dsnl', 'Deep Stack NLHE', qd.dsnl || []) +
-    buildPanel('dsol', 'Deep Stack NLOHL', qd.dsol || []) +
-    buildPanelCombined('Combined', qd.combined || []);
+    buildPanel('dsol', 'Deep Stack NLOHL', qd.dsol || []);
 }
 
 function buildPanel(key, title, rows) {
