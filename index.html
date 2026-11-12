@@ -1475,8 +1475,9 @@ function renderLeaguesInfo() { /* replaced by static HTML */ }
 // ── REFRESH ───────────────────────────────────────────────────
 function forceRefresh() {
   document.getElementById('refreshBtn').classList.add('spinning');
-  document.getElementById('loadingScreen').style.cssText = 'display:flex;opacity:1';
-  document.getElementById('loadingScreen').classList.remove('hidden');
+  var ls = document.getElementById('loadingScreen');
+  ls.style.cssText = '';
+  ls.classList.remove('hidden');
   document.getElementById('app').style.display = 'none';
   primaryData = null; championsData = null; finishposData = null; finishposLoading = false;
   try { localStorage.removeItem(LS_PRIMARY); localStorage.removeItem(LS_CHAMPS); localStorage.removeItem(LS_FINPOS); } catch(e) {}
