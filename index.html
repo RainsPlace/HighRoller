@@ -557,7 +557,7 @@ body.bg-image .sp-table td:first-child{color:rgba(255,255,255,.5);}
           <div class="champ-title">🏆 Quarter Champions</div>
           <div class="champ-grid" id="champGrid"></div>
           <div class="champ-title">🎖 Championship Counts</div>
-          <table class="champ-count-table"><thead><tr><th>Player</th><th>Combined</th><th>HR Open</th><th>Big Ballerz</th><th>Deep Stack NL</th><th>Deep Stack OL</th><th>Total</th></tr></thead><tbody id="champCountTable"></tbody></table>
+          <table class="champ-count-table"><thead><tr><th>Player</th><th>Combined</th><th>HR Open</th><th>Big Ballerz</th><th>Deep Stack NLHE</th><th>Deep Stack NLOHL</th><th>Total</th></tr></thead><tbody id="champCountTable"></tbody></table>
         </div>
       </div>
 
@@ -1308,7 +1308,7 @@ function renderChampions() {
     var ya=parseInt(a.slice(3)),qa=parseInt(a[1]),yb=parseInt(b.slice(3)),qb=parseInt(b[1]);
     return yb!==ya ? yb-ya : qb-qa;
   });
-  var catColor = {'Combined':'var(--gold)','HR Open':'var(--accent-hro)','Big Ballerz':'var(--accent-bbz)','Deep Stack NL':'var(--accent-dsnl)','Deep Stack OL':'var(--accent-dsol)'};
+  var catColor = {'Combined':'var(--gold)','HR Open':'var(--accent-hro)','Big Ballerz':'var(--accent-bbz)','Deep Stack NLHE':'var(--accent-dsnl)','Deep Stack NLOHL':'var(--accent-dsol)'};
   var html = qOrder.map(function(q){
     return byQ[q].map(function(c){
       var col = catColor[c.category] || 'var(--gold)';
